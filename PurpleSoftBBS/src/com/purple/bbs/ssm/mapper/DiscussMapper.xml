@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.purple.bbs.ssm.mapper.DiscussMapper" >
+
+    <select id="findClasses" resultType="SysClasses">
+        select * from classes
+    </select>
+
+	<select id="findClassesIdByName" parameterType="String" resultType="int">
+		select id from classes where namecode = #{classestype}
+	</select>
+    <select id="findProduct" resultType="SysProduct">
+        select * from product
+    </select>
+    
+    <insert id="saveDiscuss" parameterType="SysDiscuss">
+        insert into discuss (classesid,title,productid,version,browser,reward,publishdate,discussstatus,topstatus,userid,content) values
+        (#{sysDiscuss.classesid},#{sysDiscuss.title},#{sysDiscuss.productid},#{sysDiscuss.version},#{sysDiscuss.browser},#{sysDiscuss.reward},#{sysDiscuss.publishDate},#{sysDiscuss.status},#{sysDiscuss.topStatus},#{sysDiscuss.userid},#{sysDiscuss.content})
+    </insert>
+    
+    <select id="findBestDiscuss" resultType="SysDiscussPlus">
+    	SELECT  * FROM (SELECT temp.*,NAME FROM(SELECT * FROM discuss LEFT JOIN USER ON discuss.`userid` = user.`id`) temp LEFT JOIN classes ON temp.classesid = classes.id ) temp2 WHERE temp2.topstatus = 1 ORDER BY publishdate DESC LIMIT 5
+    </select>
+    
+    <select id="findAllDiscuss" resultType="SysDiscussPlus">
+    	SELECT temp.*,NAME FROM(SELECT * FROM discuss LEFT JOIN USER ON discuss.`userid` = user.`id`) temp LEFT JOIN classes ON temp.classesid = classes.id ORDER BY publishdate DESC
+    </select>
+    
+    <select id="findDiscussByPage" resultType="SysDiscussPlus">
+        SELECT temp.*,NAME FROM(SELECT * FROM discuss LEFT JOIN USER ON discuss.`userid` = user.`id`) temp LEFT JOIN classes ON temp.classesid = classes.id ORDER BY publishdate DESC LIMIT #{begin},#{pageSize}
+    </select>
+    
+    <select id="findClassesDiscussByPage" resultType="SysDiscussPlus">
+    	SELECT * FROM(SELECT temp.*,NAME FROM(SELECT * FROM discuss LEFT JOIN USER ON discuss.`userid` = user.`id`) temp LEFT JOIN classes ON temp.classesid = classes.id ) temp2 WHERE temp2.classesid = #{classesid} ORDER BY publishdate DESC LIMIT #{begin},#{pageSize} 
+    </select>
+    
+    <select id="findCloseDiscussByPage" resultType="SysDiscussPlus">
+    	SELECT * FROM (SELECT temp.*,NAME FROM(SELECT * FROM discuss LEFT JOIN USER ON discuss.`userid` = user.`id`) temp LEFT JOIN classes ON temp.classesid = classes.id) temp2 WHERE temp2.discussstatus = 1  ORDER BY publishdate DESC  LIMIT #{begin},#{pageSize} 
+    </select>
+    <select id="findCloseClassesDiscussByPage" resultType="SysDiscussPlus">
+        SELECT * FROM(SELECT temp.*,NAME FROM(SELECT * FROM discuss LEFT JOIN USER ON discuss.`userid` = user.`id`) temp LEFT JOIN classes ON temp.classesid = classes.id ) temp2 WHERE temp2.classesid = #{classesid} and temp2.discussstatus = 1  ORDER BY publishdate DESC LIMIT #{begin},#{pageSize} 
+    </select>
+    
+    <select id="findOpenDiscussByPage"  resultType="SysDiscussPlus">
+    	SELECT * FROM (SELECT temp.*,NAME FROM(SELECT * FROM discuss LEFT JOIN USER ON discuss.`userid` = user.`id`) temp LEFT JOIN classes ON temp.classesid = classes.id) temp2 WHERE temp2.discussstatus = 0  ORDER BY publishdate DESC  LIMIT #{begin},#{pageSize} 
+    </select>
+    
+    <select id="findOpenClassesDiscussByPage" resultType="SysDiscussPlus">
+        SELECT * FROM(SELECT temp.*,NAME FROM(SELECT * FROM discuss LEFT JOIN USER ON discuss.`userid` = user.`id`) temp LEFT JOIN classes ON temp.classesid = classes.id ) temp2 WHERE temp2.classesid = #{classesid} and temp2.discussstatus = 0  ORDER BY publishdate DESC LIMIT #{begin},#{pageSize} 
+    </select>
+    
+    <select id="findBestDiscussByPage" resultType="SysDiscussPlus">
+    	SELECT * FROM (SELECT temp.*,NAME FROM(SELECT * FROM discuss LEFT JOIN USER ON discuss.`userid` = user.`id`) temp LEFT JOIN classes ON temp.classesid = classes.id) temp2 WHERE temp2.best = 1   ORDER BY publishdate DESC LIMIT #{begin},#{pageSize}
+    </select>
+    
+    <select id="findBestClassesDiscussByPage" resultType="SysDiscussPlus">
+        SELECT * FROM(SELECT temp.*,NAME FROM(SELECT * FROM discuss LEFT JOIN USER ON discuss.`userid` = user.`id`) temp LEFT JOIN classes ON temp.classesid = classes.id ) temp2 WHERE temp2.classesid = #{classesid} and temp2.best = 1  ORDER BY publishdate DESC LIMIT #{begin},#{pageSize} 
+    </select>
+    
+    <select id="findTopTwentyDiscuss" resultType="SysDiscussPlus">
+        SELECT temp.*,NAME FROM(SELECT * FROM discuss LEFT JOIN USER ON discuss.`userid` = user.`id`) temp LEFT JOIN classes ON temp.classesid = classes.id ORDER BY publishdate DESC LIMIT 20
+    </select>
+    
+    <select id="findtopTwentyOpenDiscuss" resultType="SysDiscussPlus">
+        SELECT * FROM (SELECT temp.*,NAME FROM(SELECT * FROM discuss LEFT JOIN USER ON discuss.`userid` = user.`id`) temp LEFT JOIN classes ON temp.classesid = classes.id )temp2 WHERE temp2.discussstatus = 0 ORDER BY publishdate DESC LIMIT 20
+    </select>
+    
+    <select id="findtopTwentyCloseDiscuss" resultType="SysDiscussPlus">
+        SELECT * FROM (SELECT temp.*,NAME FROM(SELECT * FROM discuss LEFT JOIN USER ON discuss.`userid` = user.`id`) temp LEFT JOIN classes ON temp.classesid = classes.id )temp2 WHERE temp2.discussstatus = 1 ORDER BY publishdate DESC LIMIT 20
+    </select>
+    <select id="findtopTwentyBestDiscuss" resultType="SysDiscussPlus">
+        SELECT * FROM (SELECT temp.*,NAME FROM(SELECT * FROM discuss LEFT JOIN USER ON discuss.`userid` = user.`id`) temp LEFT JOIN classes ON temp.classesid = classes.id )temp2 WHERE temp2.best = 1 ORDER BY publishdate DESC LIMIT 20
+    </select>
+    
+    <select id="findThisWeekTopTenDiscuss" resultType="SysDiscussPlus">
+    	SELECT * FROM(SELECT * FROM discuss LEFT JOIN USER ON user.id = discuss.`userid` )temp where temp.replycount !=0 ORDER BY temp.replycount DESC LIMIT 0,10
+    </select>
+    <resultMap type="SysUser" id="SysUserMap">
+    	<id column="id" property="id"/>
+    	<result column="myreplycount" property="myreplaycount"/>
+    </resultMap>
+    <select id="findTopTenReplyUser" resultMap="SysUserMap">
+    	SELECT * FROM  USER WHERE myreplycount != 0 ORDER BY myreplycount DESC LIMIT 0,10
+    </select>
+    
+    <select id="findOpenDiscussCount" resultType="int">
+        select count(*) from discuss where discussstatus = 0
+    </select>
+    
+    <select id="findCloseDiscussCount" resultType="int">
+        select count(*) from discuss where discussstatus = 1
+    </select>
+    
+    <select id="findBestDiscussCount" resultType="int">
+        select count(*) from discuss where best = 1
+    </select>
+    
+    <select id="findAllDiscussCountByClassesId" resultType="int">
+    	select count(*) from discuss where classesid = #{classesid}
+    </select>
+    
+    <select id="findOpenDiscussCountByClassesId" resultType="int">
+    	select count(*) from discuss where classesid = #{classesid} and discussstatus = 0
+    </select>
+    
+    <select id="findCloseDiscussCountByClassesId" resultType="int">
+    	select count(*) from discuss where classesid = #{classesid} and discussstatus = 1
+    </select>
+    
+    <select id="findBestDiscussCountByClassesId" resultType="int">
+    	select count(*) from discuss where classesid = #{classesid} and best = 1
+    </select>
+    
+    <select id="findDiscussDetailByDiscussId" resultType="SysDiscussPlus">
+        SELECT * FROM (SELECT temp.*,NAME FROM(SELECT * FROM discuss LEFT JOIN USER ON discuss.`userid` = user.`id`) temp LEFT JOIN classes ON temp.classesid = classes.id )temp2 WHERE temp2.discussid =#{discussid}
+    </select>
+    <select id="findReadCountByDiscussId" resultType="int">
+        SELECT readcount FROM discuss WHERE discussid = #{discussid}
+    </select>
+    <update id="addDiscussReadCountByDiscussId">
+        UPDATE discuss SET readcount = readcount + 1 WHERE discussid = #{discussid}
+    </update>
+    
+    <select id="findDiscussCountByUserid" resultType="int">
+        SELECT COUNT(*) FROM discuss WHERE userid = #{id}
+    </select>
+    
+    <update id="updateDiscussByDiscussId">
+    	update discuss set classesid = #{sysDiscuss.classesid} , title = #{sysDiscuss.title} , productid = #{sysDiscuss.productid} ,version = #{sysDiscuss.version} , browser = #{sysDiscuss.browser} , publishdate = #{sysDiscuss.publishDate} , content = #{sysDiscuss.content} where discussid = #{discussid}
+    </update>
+    
+    <select id="findTopTenQuestionDiscussByUserid" resultType="SysDiscuss" parameterType="int">
+    	SELECT * FROM discuss WHERE userid = #{id} AND classesid = 1 ORDER BY publishdate DESC LIMIT 0,10
+    </select>
+    
+    <select id="findIsStoreDiscuss" resultType="int" parameterType="String">
+    	select count(*) from discussstore where uid = #{userid} and disid = #{discussid}
+    </select>
+    <insert id="storeDiscuss" parameterType="String">
+    	insert into discussstore (uid,disid) values (#{userid},#{discussid})
+    </insert>
+    
+    <select id="findStoreDiscussCountByUserid" resultType="int">
+    	select count(*) from discussstore where uid = #{id}
+    </select>
+    
+    <insert id="addDiscussReply" parameterType="String">
+    	insert into reply (discid,replycontent,replyerid,disuserid,byreplyerid,replydate) values(#{discid},#{replycontent},#{replyerid},#{disuserid},#{byreplyerid},#{replydate})
+    </insert>
+    
+    <select id="findReplyContent" resultType="SysReply" parameterType="String">
+    	SELECT * FROM(SELECT * FROM (SELECT * FROM reply LEFT JOIN USER ON user.`id` = reply.`replyerid` ) temp WHERE temp.discid = #{discid}) temp2 LEFT JOIN discuss ON temp2.discid = discuss.`discussid` ORDER BY replydate ASC
+    </select>
+    
+    <update id="addReplyCountBydiscussid">
+    	UPDATE discuss SET replycount = replycount + 1 WHERE discussid = #{discussid}
+    </update>
+    <delete id="deleteDiscussBydiscussId" parameterType="String">
+    	DELETE FROM discuss WHERE discussid = #{discussid}
+    </delete>
+    <delete id="deleteDiscussReplyBydiscussId" parameterType="String">
+    	DELETE FROM reply WHERE discid = #{discussid}
+    </delete>
+    <update id="acceptReplyByrid" parameterType="String">
+        UPDATE reply SET accept = 1 WHERE rid = #{replyid}
+    </update>
+    <update id="updateDiscussAcceptStatus" parameterType="String">
+    	UPDATE discuss SET hasaccept = 1, discussstatus = 1 WHERE discussid = #{discussid}
+    </update>
+    
+    <select id="findreplyAccept" parameterType="String" resultType="int">
+        SELECT accept FROM reply WHERE rid =#{replyid}
+    </select>
+    <delete id="deleteReplyByrid" parameterType="String">
+    	DELETE FROM reply WHERE rid = #{replyid}
+    </delete>
+    
+    <select id="updateDiscussReplyCountMinus">
+    	UPDATE discuss SET replycount = replycount - 1 WHERE discussid = #{discussid}
+    </select>
+    
+    <select id="findReplyItemByReperid" resultType="SysReply">
+        SELECT * FROM(SELECT * FROM (SELECT * FROM reply LEFT JOIN USER ON reply.`replyerid` = user.`id`)temp )temp2 LEFT JOIN discuss ON temp2.discid = discuss.`discussid`
+        WHERE temp2.replyerid = 1 ORDER BY replydate DESC LIMIT 0,10
+    </select>
+</mapper>

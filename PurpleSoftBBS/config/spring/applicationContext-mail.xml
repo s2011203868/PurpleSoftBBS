@@ -1,0 +1,40 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans-4.3.xsd 
+        http://www.springframework.org/schema/mvc 
+        http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd 
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context-4.3.xsd 
+        http://www.springframework.org/schema/aop 
+        http://www.springframework.org/schema/aop/spring-aop-4。0.xsd 
+        http://www.springframework.org/schema/tx 
+        http://www.springframework.org/schema/tx/spring-tx-4.3.xsd ">
+        
+    
+    <!-- 使用qq邮箱 -->
+    <bean id="javaMailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+        <!--<property name="host" value="smtp.qq.com"/> -->
+        <property name="host" value="smtp.qq.com"/>
+        <property name="port" value="587"/>
+        <property name="username" value="395078618@qq.com"/>
+        <!-- qq邮箱的授权码，如果是企业邮箱，则使用登录密码 -->
+        <property name="password" value="aflngrpnkwyfbjbb"/>
+        <property name="javaMailProperties">
+            <props >
+                <prop key="mail.smtp.auth">true</prop>
+            </props>
+        </property>
+    </bean>
+    
+    
+    <!-- 配置发送者及标题  这个不写也可以，可以在发送的时候直接配置都行-->
+    <bean id="simpleMailMessage" class="org.springframework.mail.SimpleMailMessage">
+        <property name="from" value="395078618@qq.com" />
+        <property name="subject" value="紫软社区" />
+    </bean>
+    
+ 
+</beans>

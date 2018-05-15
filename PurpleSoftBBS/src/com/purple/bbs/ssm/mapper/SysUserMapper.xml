@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.purple.bbs.ssm.mapper.SysUserMapper" >
+
+<insert id="saveSysUser">
+	insert into user (email,username,password,salt,status,activate,sex,registtime,icon,kiss) values (#{email},#{username},#{password},#{salt},1,0,#{sex},#{registTime},#{icon},100)
+</insert>
+
+<select id="findUserByEmail" parameterType="String" resultType="SysUser">
+	select * from user where email = #{email}
+</select>
+<select id="findUserByUserId" parameterType="String" resultType="SysUser">
+	select * from user where id = #{userid}
+</select>
+<select id="findUserByUserName" parameterType="String" resultType="SysUser">
+	select * from user where username = #{username}
+</select>
+
+<update id="setLastLoginTime">
+	update user set lastlogintime = #{nowTime} where id = #{id}
+</update>
+
+<update id="updateIcon">
+	update user set icon = #{icon} where id = #{id}
+</update>
+
+<update id="updateUserPassword">
+	update user set password = #{newPassword} where email = #{email}
+</update>
+
+<update id="editUserInfo">
+    update user set email = #{email} , username = #{username} , sex = #{sex} , city = #{city} , sign = #{sign} where id = #{userid}
+</update>
+
+<update id="editEmailActivate">
+    update user set activate = #{activate} where id = #{userid}
+</update>
+
+<update id="updateActivateToken">
+	update user set activatetoken = #{token} where email = #{email}
+</update>
+
+<update id="updateResetToken">
+	update user set resettoken = #{token} where email = #{email}
+</update>
+
+<select id="findActiveStatusByUserid" resultType="int">
+    SELECT activate FROM USER WHERE id = #{userid}
+</select>
+
+<select id="findMyPublishDiscussByPage" resultType="SysDiscuss">
+	SELECT * FROM discuss WHERE userid = #{userid} ORDER BY publishdate DESC LIMIT #{begin},#{pageSize}
+</select>
+
+<select id="findMyStoreDiscussByPage"  resultType="SysDiscuss">
+	SELECT * FROM discuss WHERE discussid IN (SELECT disid FROM discussstore WHERE uid = #{userid}) ORDER BY publishdate DESC LIMIT #{begin},#{pageSize}
+</select>
+
+<update id="addReplyCountByUserid" parameterType="String">
+	UPDATE USER SET myreplycount = myreplycount+1 WHERE id = #{replyerid}
+</update>
+<insert id="sendMessageToByReplyer" parameterType="String">
+    insert into message (senderid,receiverid,disid,sendcontent,senddate) values (#{replyerid},#{byreplyerid},#{discid},#{replycontent},#{replydate})
+</insert>
+<select id="findMessageByUserid" resultType="int">
+    SELECT COUNT(*) FROM message WHERE receiverid = #{userid} AND readed = 0
+</select>
+<update id="updateMessageStats">
+    UPDATE message SET readed = 1 WHERE receiverid = #{userid}
+</update>
+
+<select id="getUserMessage" resultType="SysMessage">
+    SELECT * FROM(SELECT * FROM(SELECT * FROM message LEFT JOIN USER ON message.`senderid` = user.`id`)temp LEFT JOIN discuss ON temp.disid = discuss.`discussid`) temp2 WHERE temp2.receiverid = #{userid} AND temp2.readed = 0 ORDER BY senddate DESC
+</select>
+
+<update id="updateUserKiss" parameterType="int">
+    UPDATE USER SET kiss = kiss - #{reward} WHERE id = #{userid}
+</update>
+<update id="updatePlusUserKiss" parameterType="int">
+    UPDATE USER SET kiss = kiss + #{kiss} WHERE id = #{userid}
+</update>
+
+<select id="findReplyCountInDiscuss" parameterType="String" resultType="int">
+    SELECT COUNT(*) FROM reply WHERE discid = #{discid} AND replyerid = #{replyerid}
+</select>
+<update id="setAuthentication">
+    update user set authentication = #{authentication} ,authenticatelevel = #{authenticatelevel} where email = #{email}
+</update>
+</mapper>
