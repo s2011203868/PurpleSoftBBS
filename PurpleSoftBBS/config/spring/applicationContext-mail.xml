@@ -21,7 +21,7 @@
         <property name="port" value="587"/>
         <property name="username" value="395078618@qq.com"/>
         <!-- qq邮箱的授权码，如果是企业邮箱，则使用登录密码 -->
-        <property name="password" value="aflngrpnkwyfbjbb"/>
+        <property name="password" value="你的密码"/>
         <property name="javaMailProperties">
             <props >
                 <prop key="mail.smtp.auth">true</prop>

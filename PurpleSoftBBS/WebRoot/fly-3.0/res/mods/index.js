@@ -570,7 +570,7 @@ layui.define(['layer', 'laytpl', 'form', 'element', 'upload', 'util','laypage'],
 //根据ip获取城市
   if($('#L_city').val() === ''){
     $.getScript('http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=js', function(){
-      $('#L_city').val(remote_ip_info.city||'');
+      $('#L_city').val(remote_ip_info.country+""+remote_ip_info.province+""+remote_ip_info.city||'');
     });
   }
 
